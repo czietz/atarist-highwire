@@ -3,7 +3,7 @@
 # -u: Treat unset variables as an error when substituting.
 # -x: Display expanded script commands
 
-DOWNLOAD_DIR=http://tho-otto.de/download/mint
+DOWNLOAD_DIR=https://mikro.atari.org/tho-otto.de/mint
 SYSROOT_DIR=${SYSROOT_DIR:-"/"}
 
 sudo mkdir -p "${SYSROOT_DIR}"
