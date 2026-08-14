@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <osbind.h>
+
 #include <gemx.h>
 
 #include "global.h"
@@ -12,6 +14,7 @@
 
 
 BOOL has_fsm_gdos = FALSE; /* until romvdi_init() says otherwise */
+BOOL has_eddi_cookie = FALSE;
 
 /* What vst_map_mode() was last asked for.  With a real GDOS the VDI keeps this
  * itself; without one we have to remember it, because it tells us how to read
@@ -28,6 +31,31 @@ static WORD cur_map_mode = MAP_ATARI;
 #define NARROW_MAX 1024
 static char narrow_buf[NARROW_MAX + 1];
 
+/* getcookie() reads a 32-bit configuration cookie from the system cookie jar.
+ * The pointer 'value' can be NULL.
+ */
+static BOOL getcookie(long cookie, void *value)
+{
+	typedef struct {
+		long id;
+		long val;
+	} COOKJAR;
+	COOKJAR	*cookiejar;
+	WORD i;
+
+	cookiejar = (COOKJAR *)Setexc(0x5A0/4, (void (*)())-1);
+	if (cookiejar) {
+		for (i = 0; cookiejar[i].id; i++)
+			if (cookiejar[i].id == cookie) {
+				if (value)
+					*(long *)value = cookiejar[i].val;
+				return TRUE;
+			}
+	}
+
+	return FALSE;
+}
+
 
 /*----------------------------------------------------------------------------*/
 void
@@ -39,6 +67,7 @@ romvdi_init (long gdostype)
 	 */
 	has_fsm_gdos = (gdostype == GDOS_FSM || gdostype == -65536L
 	                || memcmp (&gdostype, "fVDI", 4) == 0);
+	has_eddi_cookie = getcookie(0x45644449ul, NULL); /* 'EdDI' */
 }
 
 
@@ -297,7 +326,7 @@ hw_vq_scrninfo (WORD handle, WORD * out)
 		{ 0, 255, 1, 2, 4, 6, 3, 5, 7, 8, 9, 10, 12, 14, 11, 13 };
 	WORD i;
 
-	if (has_fsm_gdos) {
+	if (has_fsm_gdos || has_eddi_cookie) {
 		vq_scrninfo (handle, out);
 		if (out[0] >= 0 && out[0] <= 2 && out[2] >= 1 && out[2] <= 32) {
 			return;
