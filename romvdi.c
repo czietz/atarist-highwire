@@ -14,7 +14,7 @@
 
 
 BOOL has_fsm_gdos = FALSE; /* until romvdi_init() says otherwise */
-BOOL has_eddi_cookie = FALSE;
+static BOOL has_eddi_cookie = FALSE;
 
 /* What vst_map_mode() was last asked for.  With a real GDOS the VDI keeps this
  * itself; without one we have to remember it, because it tells us how to read
