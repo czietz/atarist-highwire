@@ -20,7 +20,7 @@ CPU = 68040
 
 DEFS = -DUSE_OVL -DUSE_INET -DLIBPNG -DLIBGIF -DLIBJPG
 OPTFLAGS = -funsigned-char \
-       -fomit-frame-pointer -Og -fstrength-reduce -g
+       -fomit-frame-pointer -O2 -fstrength-reduce 
 
 ifeq ($(CPU),5475)
 	OPTS = $(CPU:%=-mcpu=%) $(OPTFLAGS)
@@ -79,7 +79,7 @@ CHECKGIF := $(shell if echo -e "$(hash)include <gif_lib.h> \\nconst char *versio
 
 CFLAGS = $(INCLUDE) $(WARN) $(OPTS) $(DEFS)
 ASFLAGS = $(OPTS)
-LDFLAGS = -g
+LDFLAGS = -s
 LIBS = $(SOFTFLOAT) -lgem -lcflib -liio $(CHECKGIF) -ljpeg -lpng -lz -lm \
        #-lsocket
 
